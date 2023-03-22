@@ -1,11 +1,11 @@
 # Flaskr + TDD
 
+![gif of app](./assets/work.gif)
+
 ## Using
 
 - Flask
 - pytest
 - PicoCSS
 - SQLAlchemy
-  - SQLite version: TODO
-
-![gif of app](./assets/work.gif)
+  - [SQLite Version](https://github.com/justEstif/flaskr-tdd/tree/sqlite)
