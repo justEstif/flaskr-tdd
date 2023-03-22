@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flaskr</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css"
+    />
+  </head>
+  <body class="container">
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('index') }}"> Flaskr </a></li>
+      </ul>
+      <ul>
+        {% if not session.logged_in %}
+        <li><a href="{{ url_for('login') }}">log in</a></li>
+        {% else %}
+        <li><a href="{{ url_for('logout') }}">log out</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+    <h1>Search</h1>
+
+    <div class="container">
+      {% for message in get_flashed_messages() %}
+      <div class="flash alert alert-success col-sm-4" role="success">
+        {{ message }}
+      </div>
+      {% endfor %}
+
+      <form action="{{ url_for('search') }}" method="get" class="from-group">
+        <input type="search" id="search" name="search" placeholder="Search" />
+        <button type="submit" role="button">Submit</button>
+      </form>
+
+      <ul class="entries">
+        {% for entry in entries %} {% if query.lower() in entry.title.lower() or
+        query.lower() in entry.text.lower() %}
+        <li class="entry">
+          <h2 id="{{ entry.post_id }}">{{ entry.title }}</h2>
+          {{ entry.text|safe }}
+        </li>
+        {% endif %} {% endfor %}
+      </ul>
+    </div>
+    <script
+      type="text/javascript"
+      src="{{url_for('static', filename='main.js') }}"
+    ></script>
+  </body>
+</html>

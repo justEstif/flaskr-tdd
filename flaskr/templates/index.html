@@ -33,6 +33,9 @@
       </ul>
     </nav>
     <h1>Flaskr-TDD</h1>
+    <a class="btn btn-info" role="button" href="{{ url_for('search') }}"
+      >Search</a
+    >
     {% block body %}{% endblock %} {% if session.logged_in %}
     <details>
       <summary>Create new note</summary>
