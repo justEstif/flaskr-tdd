@@ -4,11 +4,10 @@
     <title>Flaskr</title>
     <link
       rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='style.css') }}"
+      href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css"
     />
   </head>
-  <body>
+  <body class="container">
     <div class="page">
       <h1>Flaskr-TDD</h1>
 
@@ -36,8 +35,8 @@
 
       <ul class="entries">
         {% for entry in entries %}
-        <li>
-          <h2>{{ entry.title }}</h2>
+        <li class="entry">
+          <h2 id="{{ entry.id }}">{{ entry.title }}</h2>
           {{ entry.text|safe }}
         </li>
         {% else %}
@@ -45,5 +44,9 @@
         {% endfor %}
       </ul>
     </div>
+    <script
+      type="text/javascript"
+      src="{{url_for('static', filename='main.js') }}"
+    ></script>
   </body>
 </html>

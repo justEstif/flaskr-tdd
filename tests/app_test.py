@@ -1,7 +1,8 @@
 import pytest
 import os
 from pathlib import Path
-from project.app import app, init_db, close_db
+from flask import json
+from flaskr.app import app, init_db, close_db
 
 TEST_DB = 'test.db'
 
@@ -74,3 +75,10 @@ def test_messages(client):
     assert b"No entries here so far" not in rv.data
     assert b"&lt;Hello&gt;" in rv.data
     assert b"<strong>HTML</strong> allowed here" in rv.data
+
+
+def test_delete_message(client):
+    """ensure the messages are being deleted"""
+    rv = client.get("/delete/1")
+    data = json.loads(rv.data)
+    assert data['status'] == 1
