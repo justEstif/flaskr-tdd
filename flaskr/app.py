@@ -43,7 +43,7 @@ def close_db(error):
         g.sqlite_db.close()
 
 
-@app.route("/")
+@app.route('/')
 def index():
     """Searches the database for entries, then displays them."""
     db = get_db()

@@ -6,7 +6,7 @@ const postElements = document.getElementsByClassName("entry");
 
 for (var i = 0; i < postElements.length; i++) {
   postElements[i].addEventListener("click", function () {
-    const postId = this.getElementsByTagName("h2")[0].getAttribute("id");
+    const postId = this.getElementsByTagName("header")[0].getAttribute("id");
     const node = this;
     fetch(`/delete/${postId}`)
       .then(function (resp) {
