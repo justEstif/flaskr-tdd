@@ -2,21 +2,22 @@ import pytest
 import os
 from pathlib import Path
 from flask import json
-from flaskr.app import app, init_db, close_db
+from flaskr.app import app, db
 
 TEST_DB = 'test.db'
 
 
 @pytest.fixture
 def client():
-    """sets up a known state for each test function before the test runs"""
     BASE_DIR = Path(__file__).resolve().parent.parent
-    app.config['TESTING'] = True
+    app.config["TESTING"] = True
     app.config["DATABASE"] = BASE_DIR.joinpath(TEST_DB)
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{BASE_DIR.joinpath(TEST_DB)}"
 
-    init_db()  # setup
-    yield app.test_client()  # tests run here
-    init_db()  # teardown TODO ask why
+    with app.app_context():
+        db.create_all()  # setup
+        yield app.test_client()  # tests run here
+        db.drop_all()  # teardown
 
 
 def login(client, username, password):
@@ -42,7 +43,6 @@ def test_index(client):
 
 
 def test_database(client):
-    init_db()
     assert Path("flaskr.db").is_file()
 
 

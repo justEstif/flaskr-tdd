@@ -1,11 +1,17 @@
-import sqlite3
-from flask import Flask, g, render_template, request, session, flash, redirect, url_for, abort, jsonify
+from pathlib import Path
+from flask import Flask, render_template, request, session, flash, redirect, url_for, abort, jsonify
+from flask_sqlalchemy import SQLAlchemy
+
+
+basedir = Path(__file__).resolve().parent
 
 # configuration
 DATABASE = 'flaskr.db'
 USERNAME = "admin"
 PASSWORD = 'admin'
 SECRET_KEY = "change_me"
+SQLALCHEMY_DATABASE_URI = f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # create and initialize a new Flask app
 app = Flask(__name__)
@@ -13,42 +19,27 @@ app = Flask(__name__)
 # load the config
 app.config.from_object(__name__)
 
-
-def connect_db():
-    """connects to the database"""
-    rv = sqlite3.connect(app.config["DATABASE"])
-    rv.row_factory = sqlite3.Row
-    return rv
+# init sqlalchemy
+db = SQLAlchemy(app)
 
 
-def init_db():
-    """create the database"""
-    with app.app_context():
-        db = get_db()
-        with app.open_resource("schema.sql", mode="r") as f:
-            db.cursor().executescript(f.read())
-        db.commit()
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String, nullable=False)
+    text = db.Column(db.String, nullable=False)
 
+    def __init__(self, title, text):
+        self.title = title
+        self.text = text
 
-def get_db():
-    """open database connection"""
-    if not hasattr(g, "sqlite_db"):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
-
-
-@app.teardown_appcontext
-def close_db(error):
-    if hasattr(g, "sqlite_db"):
-        g.sqlite_db.close()
+    def __repr__(self):
+        return f'<title {self.title}>'
 
 
 @app.route('/')
 def index():
     """Searches the database for entries, then displays them."""
-    db = get_db()
-    cur = db.execute('select * from entries order by id desc')
-    entries = cur.fetchall()
+    entries = db.session.query(Post)
     return render_template('index.html', entries=entries)
 
 
@@ -81,12 +72,11 @@ def add_entry():
     """add new post to database"""
     if not session.get("logged_in"):
         abort(401)
-    db = get_db()
-    db.execute(
-        "INSERT INTO entries (title, text) values (?, ?)",
-        [request.form['title'], request.form['text']]
+    new_entry = Post(
+        title=request.form['title'], text=request.form['text']
     )
-    db.commit()
+    db.session.add(new_entry)
+    db.session.commit()
     flash("New entry was successfully posted")
     return redirect(url_for("index"))
 
@@ -96,10 +86,10 @@ def delete_entry(post_id):
     """Delete post from database"""
     result = {'status': 0, 'message': 'Error'}
     try:
-        db = get_db()
-        db.execute('DELETE FROM entries WHERE id=' + post_id)
-        db.commit()
+        db.session.query(Post).filter_by(id=post_id).delete()
+        db.session.commit()
         result = {'status': 1, 'message': "Post Deleted"}
+        flash("The entry was deleted")
     except Exception as e:
         result = {'status': 0, 'message': repr(e)}
     return jsonify(result)
