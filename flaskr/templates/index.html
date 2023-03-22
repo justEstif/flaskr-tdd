@@ -8,42 +8,56 @@
     />
   </head>
   <body class="container">
-    <div class="page">
-      <h1>Flaskr-TDD</h1>
-
-      <div class="metanav">
-        {% if not session.logged_in %}
-        <a href="{{ url_for('login') }}">log in</a>
-        {% else %}
-        <a href="{{ url_for('logout') }}">log out</a>
-        {% endif %}
-      </div>
-
-      {% for message in get_flashed_messages() %}
-      <div class="flash">{{ message }}</div>
-      {% endfor %} {% block body %}{% endblock %} {% if session.logged_in %}
-      <form action="{{ url_for('add_entry') }}" method="post" class="add-entry">
-        <dl>
-          <dt>Title:</dt>
-          <dd><input type="text" size="30" name="title" /></dd>
-          <dt>Text:</dt>
-          <dd><textarea name="text" rows="5" cols="40"></textarea></dd>
-          <dd><input type="submit" value="Share" /></dd>
-        </dl>
-      </form>
-      {% endif %}
-
-      <ul class="entries">
-        {% for entry in entries %}
-        <li class="entry">
-          <h2 id="{{ entry.id }}">{{ entry.title }}</h2>
-          {{ entry.text|safe }}
-        </li>
-        {% else %}
-        <li><em>No entries yet. Add some!</em></li>
-        {% endfor %}
+    <nav>
+      <ul>
+        <li>Flaskr</li>
       </ul>
-    </div>
+      <ul>
+        {% for message in get_flashed_messages() %}
+        <li>
+          <ins class="mark">
+            {{ message }}
+            <span
+              class="closebtn"
+              onclick="this.parentElement.style.display='none';"
+              >&times;</span
+            >
+          </ins>
+        </li>
+        {% endfor %} {% if not session.logged_in %}
+        <li><a href="{{ url_for('login') }}">log in</a></li>
+        {% else %}
+        <li><a href="{{ url_for('logout') }}">log out</a></li>
+
+        {% endif %}
+      </ul>
+    </nav>
+    <h1>Flaskr-TDD</h1>
+    {% block body %}{% endblock %} {% if session.logged_in %}
+    <details>
+      <summary>Create new note</summary>
+      <form action="{{ url_for('add_entry') }}" method="post">
+        <div class="grid">
+          <label for="title"
+            >Title
+            <input type="text" id="title" name="title" placeholder="Title" />
+          </label>
+          <label for="text">Text</label>
+          <textarea name="text" rows="5" cols="40"></textarea>
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+    </details>
+    {% endif %} {% for entry in entries %}
+
+    <article class="entry">
+      <header id="{{ entry.id }}">{{ entry.title }}</header>
+      {{ entry.text|safe }}
+    </article>
+
+    {% else %}
+    <article>No entries yet. Add some!</article>
+    {% endfor %}
     <script
       type="text/javascript"
       src="{{url_for('static', filename='main.js') }}"

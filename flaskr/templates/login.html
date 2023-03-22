@@ -4,41 +4,52 @@
     <title>Flaskr-TDD | Login</title>
     <link
       rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='style.css') }}"
+      href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css"
     />
   </head>
-  <body>
-    <div class="page">
-      <h1>Flaskr</h1>
-
-      <div class="metanav">
+  <body class="container">
+    <nav>
+      <ul>
+        <li>Flaskr</li>
+      </ul>
+      <ul>
         {% if not session.logged_in %}
-        <a href="{{ url_for('login') }}">log in</a>
+        <li><a href="{{ url_for('login') }}">log in</a></li>
         {% else %}
-        <a href="{{ url_for('logout') }}">log out</a>
+        <li><a href="{{ url_for('logout') }}">log out</a></li>
         {% endif %}
+      </ul>
+    </nav>
+    <h1>Login</h1>
+
+    {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+    {% endfor %} {% block body %}{% endblock %} {% if error %}
+    <p class="error"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+
+    <form action="{{ url_for('login') }}" method="post">
+      <div class="grid">
+        <label for="username"
+          >Username
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Username"
+          />
+        </label>
+        <label for="password"
+          >Password
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Password"
+          />
+        </label>
       </div>
-
-      {% for message in get_flashed_messages() %}
-      <div class="flash">{{ message }}</div>
-      {% endfor %} {% block body %}{% endblock %}
-
-      <h2>Login</h2>
-
-      {% if error %}
-      <p class="error"><strong>Error:</strong> {{ error }}</p>
-      {% endif %}
-
-      <form action="{{ url_for('login') }}" method="post">
-        <dl>
-          <dt>Username:</dt>
-          <dd><input type="text" name="username" /></dd>
-          <dt>Password:</dt>
-          <dd><input type="password" name="password" /></dd>
-          <dd><input type="submit" value="Login" /></dd>
-        </dl>
-      </form>
-    </div>
+      <button type="submit">Submit</button>
+    </form>
   </body>
 </html>
