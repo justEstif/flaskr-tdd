@@ -35,12 +35,12 @@ def logout(client):
     )
 
 
-def test_index():
+def test_index(client):
     response = client.get("/", content_type="html/text")
     assert response.status_code == 200
 
 
-def test_database():
+def test_database(client):
     init_db()
     assert Path("flaskr.db").is_file()
 
